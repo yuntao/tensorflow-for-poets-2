@@ -96,12 +96,20 @@ public class ClassifierActivity extends CameraActivity implements OnImageAvailab
 
   private long lastProcessingTimeMs;
 
-  private TtsHelper ttsHelper;
+  private Greeter greeter;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    ttsHelper = new TtsHelper(getApplicationContext());
+    greeter = new Greeter(getApplicationContext());
+  }
+
+  @Override
+  public synchronized void onDestroy() {
+    super.onDestroy();
+    if (greeter !=null){
+      greeter.onDestroy();
+    }
   }
 
   @Override
@@ -239,19 +247,11 @@ public class ClassifierActivity extends CameraActivity implements OnImageAvailab
             requestRender();
             computing = false;
 
-            filterResultsAndGreet(results);
+            greeter.filterAndGreet(results);
           }
         });
 
 //    Trace.endSection();
-  }
-
-  private void filterResultsAndGreet(List<Classifier.Recognition> results) {
-    for (Classifier.Recognition recognition : results) {
-      if (recognition.getConfidence() > .8) {
-        ttsHelper.greet(recognition.getTitle());
-      }
-    }
   }
 
   @Override
