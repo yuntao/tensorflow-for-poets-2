@@ -126,9 +126,9 @@ public class TensorFlowImageClassifier implements Classifier {
   @Override
   public List<Recognition> recognizeImage(final Bitmap bitmap) {
     // Log this method so that it can be analyzed with systrace.
-    Trace.beginSection("recognizeImage");
+//    Trace.beginSection("recognizeImage");
 
-    Trace.beginSection("preprocessBitmap");
+//    Trace.beginSection("preprocessBitmap");
     // Preprocess the image data from 0-255 int to normalized float based
     // on the provided parameters.
     bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
@@ -138,22 +138,22 @@ public class TensorFlowImageClassifier implements Classifier {
       floatValues[i * 3 + 1] = (((val >> 8) & 0xFF) - imageMean) / imageStd;
       floatValues[i * 3 + 2] = ((val & 0xFF) - imageMean) / imageStd;
     }
-    Trace.endSection();
+//    Trace.endSection();
 
     // Copy the input data into TensorFlow.
-    Trace.beginSection("feed");
+//    Trace.beginSection("feed");
     inferenceInterface.feed(inputName, floatValues, 1, inputSize, inputSize, 3);
-    Trace.endSection();
+//    Trace.endSection();
 
     // Run the inference call.
-    Trace.beginSection("run");
+//    Trace.beginSection("run");
     inferenceInterface.run(outputNames, logStats);
-    Trace.endSection();
+//    Trace.endSection();
 
     // Copy the output Tensor back into the output array.
-    Trace.beginSection("fetch");
+//    Trace.beginSection("fetch");
     inferenceInterface.fetch(outputName, outputs);
-    Trace.endSection();
+//    Trace.endSection();
 
     // Find the best classifications.
     PriorityQueue<Recognition> pq =
@@ -178,7 +178,7 @@ public class TensorFlowImageClassifier implements Classifier {
     for (int i = 0; i < recognitionsSize; ++i) {
       recognitions.add(pq.poll());
     }
-    Trace.endSection(); // "recognizeImage"
+//    Trace.endSection(); // "recognizeImage"
     return recognitions;
   }
 

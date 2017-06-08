@@ -181,7 +181,7 @@ public class ClassifierActivity extends CameraActivity implements OnImageAvailab
       }
       computing = true;
 
-      Trace.beginSection("imageAvailable");
+//      Trace.beginSection("imageAvailable");
 
       final Plane[] planes = image.getPlanes();
       fillBytes(planes, yuvBytes);
@@ -206,7 +206,7 @@ public class ClassifierActivity extends CameraActivity implements OnImageAvailab
         image.close();
       }
       LOGGER.e(e, "Exception!");
-      Trace.endSection();
+//      Trace.endSection();
       return;
     }
 
@@ -234,7 +234,7 @@ public class ClassifierActivity extends CameraActivity implements OnImageAvailab
           }
         });
 
-    Trace.endSection();
+//    Trace.endSection();
   }
 
   @Override
