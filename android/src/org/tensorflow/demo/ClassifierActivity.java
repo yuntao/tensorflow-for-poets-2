@@ -26,8 +26,8 @@ import android.media.Image;
 import android.media.Image.Plane;
 import android.media.ImageReader;
 import android.media.ImageReader.OnImageAvailableListener;
+import android.os.Bundle;
 import android.os.SystemClock;
-import android.os.Trace;
 import android.util.Size;
 import android.util.TypedValue;
 import android.view.Display;
@@ -37,7 +37,6 @@ import org.tensorflow.demo.OverlayView.DrawCallback;
 import org.tensorflow.demo.env.BorderedText;
 import org.tensorflow.demo.env.ImageUtils;
 import org.tensorflow.demo.env.Logger;
-import org.tensorflow.demo.R;
 
 public class ClassifierActivity extends CameraActivity implements OnImageAvailableListener {
   private static final Logger LOGGER = new Logger();
@@ -96,6 +95,14 @@ public class ClassifierActivity extends CameraActivity implements OnImageAvailab
   private BorderedText borderedText;
 
   private long lastProcessingTimeMs;
+
+  private TtsHelper ttsHelper;
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    ttsHelper = new TtsHelper(getApplicationContext());
+  }
 
   @Override
   protected int getLayoutId() {
@@ -231,10 +238,20 @@ public class ClassifierActivity extends CameraActivity implements OnImageAvailab
             resultsView.setResults(results);
             requestRender();
             computing = false;
+
+            filterResultsAndGreet(results);
           }
         });
 
 //    Trace.endSection();
+  }
+
+  private void filterResultsAndGreet(List<Classifier.Recognition> results) {
+    for (Classifier.Recognition recognition : results) {
+      if (recognition.getConfidence() > .8) {
+        ttsHelper.greet(recognition.getTitle());
+      }
+    }
   }
 
   @Override
