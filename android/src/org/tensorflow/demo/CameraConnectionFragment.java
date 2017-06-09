@@ -50,6 +50,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -127,6 +128,8 @@ public class CameraConnectionFragment extends Fragment {
    * An {@link AutoFitTextureView} for camera preview.
    */
   private AutoFitTextureView textureView;
+
+  private ImageButton switchCameraButton;
 
   /**
    * A {@link CameraCaptureSession } for camera preview.
@@ -224,6 +227,7 @@ public class CameraConnectionFragment extends Fragment {
    */
   private final int layout;
 
+  private boolean isFrontCamera = true;
 
   private final ConnectionCallback cameraConnectionCallback;
 
@@ -323,6 +327,19 @@ public class CameraConnectionFragment extends Fragment {
   @Override
   public void onViewCreated(final View view, final Bundle savedInstanceState) {
     textureView = (AutoFitTextureView) view.findViewById(R.id.texture);
+    switchCameraButton = (ImageButton) view.findViewById(R.id.switch_camera_button);
+    switchCameraButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        isFrontCamera = !isFrontCamera;
+        if (textureView.isAvailable()) {
+          closeCamera();
+          stopBackgroundThread();
+          startBackgroundThread();
+          openCamera(textureView.getWidth(), textureView.getHeight());
+        }
+      }
+    });
   }
 
   @Override
@@ -366,10 +383,10 @@ public class CameraConnectionFragment extends Fragment {
       for (final String cameraId : manager.getCameraIdList()) {
         final CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
 
-        // We don't use a front facing camera in this sample.
+        // We use a front facing camera by default
+        final int direction = isFrontCamera ? CameraCharacteristics.LENS_FACING_FRONT : CameraCharacteristics.LENS_FACING_BACK;
         final Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
-        // if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
-        if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
+        if (facing != null && facing != direction) {
           continue;
         }
 
